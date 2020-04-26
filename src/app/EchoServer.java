@@ -12,17 +12,26 @@ public class EchoServer {
         System.out.println("Server started on port number 6789");
         System.out.println("Awaiting connection...");
 
-        Socket clientSocket = serverSocket.accept();
-        System.out.println("Client connected successfully");
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-
-        String inputLine;
-        while((inputLine = in.readLine()) != null) {
-            System.out.println("Server: " + inputLine);
-            out.println(inputLine);
+        while(true) {
+	        Socket clientSocket = serverSocket.accept();
+	        System.out.println("Client connected successfully");
+	
+	        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+	        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+	
+	        String inputLine;
+	        while((inputLine = in.readLine()) != null) {
+	            System.out.println("Server: " + inputLine);
+	            out.println(inputLine);
+	            if(inputLine.equals("Bye")) {
+	            	break;
+	            }
+	        }
+	        
+	        System.out.println("Ending connection with client");
+	        out.close();
+	        in.close();
+	        clientSocket.close();
         }
-        System.out.println("Ending connection with client");
     }
 }
