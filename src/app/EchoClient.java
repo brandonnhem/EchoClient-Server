@@ -25,11 +25,21 @@ public class EchoClient {
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-
+        
         String str;
         while((str = input.readLine()) != null) {
             out.println(str);
-            System.out.println("Echo: " + str);
+            System.out.println("Echo: " + in.readLine());
+            System.out.println();
+            if(str.equalsIgnoreCase("Bye")) {
+            	break;
+            }
         }
+        
+        System.out.println("Ending connection with server");
+        out.close();
+        in.close();
+        input.close();
+        socket.close();
     }
 }
