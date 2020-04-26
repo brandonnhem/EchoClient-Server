@@ -23,7 +23,7 @@ public class EchoServer {
 	        while((inputLine = in.readLine()) != null) {
 	            System.out.println("Server: " + inputLine);
 	            out.println(inputLine);
-	            if(inputLine.equals("Bye")) {
+	            if(inputLine.equalsIgnoreCase("Bye")) {
 	            	break;
 	            }
 	        }
