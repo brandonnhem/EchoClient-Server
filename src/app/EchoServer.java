@@ -1,37 +1,35 @@
 package app;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 
 public class EchoServer {
-    public static void main(String[] args) throws Exception {
-        ServerSocket serverSocket = new ServerSocket(6789);
-        System.out.println("Server started on port number 6789");
-        System.out.println("Awaiting connection...");
+    public static void main(String[] args) {
+        int port = 6789;
 
-        while(true) {
-	        Socket clientSocket = serverSocket.accept();
-	        System.out.println("Client connected successfully");
-	
-	        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-	        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-	
-	        String inputLine;
-	        while((inputLine = in.readLine()) != null) {
-	            System.out.println("Server: " + inputLine);
-	            out.println(inputLine);
-	            if(inputLine.equalsIgnoreCase("Bye")) {
-	            	break;
-	            }
-	        }
-	        
-	        System.out.println("Ending connection with client");
-	        out.close();
-	        in.close();
-	        clientSocket.close();
+        DatagramSocket socket = null;
+        try {
+            socket = new DatagramSocket(port);
+            System.out.println("UDP Echo server on port " + port + " successfully created.");
+            System.out.println("Awaiting messages...");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
         }
-    }
+
+        try {
+            byte buffer [] = new byte[1024];
+            DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length);
+            String input;
+            while(true) {
+                socket.receive(datagramPacket);
+                input = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+                System.out.println("Received from server: " + input);
+                socket.send(datagramPacket);
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }    
 }
