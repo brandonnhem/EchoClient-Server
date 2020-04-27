@@ -9,16 +9,18 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 public class EchoClient {
-    public static class UDPEchoReader extends Thread {
+    public static class UDPEchoReader extends Thread { // Extending Thread allows for infinte loops to occur
+        public boolean active;
+        public DatagramSocket datagramSocket;
+
         public UDPEchoReader(DatagramSocket socket) {
             datagramSocket = socket;
             active = true;
         }
         
         public void run() {
-            byte[] buffer = new byte[1024];
-            DatagramPacket incoming = new DatagramPacket(buffer,
-            buffer.length);
+            byte[] buffer = new byte[1024]; // used to store incoming data
+            DatagramPacket incoming = new DatagramPacket(buffer, buffer.length); // incoming data packet
             String receivedString;
             while(active) {
                 try {
@@ -34,24 +36,22 @@ public class EchoClient {
                 }
             }
         }
-        public boolean active;
-        public DatagramSocket datagramSocket;
     }
 
-    private static int PORT;
+    private static int PORT; // port number
 
     public static void main(String[] args) {
-        InetAddress address = null;
+        InetAddress address = null; // address, can be "localhost" or actual IP address
 
         DatagramSocket socket = null;
-        BufferedReader keyboard = null;
+        BufferedReader keyboard = null; // used to read input
 
         try {
             keyboard = new BufferedReader(new InputStreamReader(System.in));
             if(args.length == 2) {
                 address = InetAddress.getByName(args[0]);
                 PORT = Integer.parseInt(args[1]);
-            } else {
+            } else if(args.length == 0) {
                 String userInput;
                 System.out.print("Enter IP Address: ");
                 userInput = keyboard.readLine();
@@ -59,19 +59,25 @@ public class EchoClient {
                 System.out.print("Enter port number: ");
                 userInput = keyboard.readLine();
                 PORT = Integer.parseInt(userInput);
+            } else {
+                System.out.println("Expected 2 arguments, received " + args.length);
+                System.out.println("Exiting program..");
+                System.exit(1);
             }
             socket = new DatagramSocket();
         } catch (SocketException e) {
             System.out.println(e.getMessage());
+            System.out.println("Exiting program..");
             System.exit(1);
         } catch (IOException e) {
             System.out.println(e.getMessage());
+            System.out.println("Exiting program..");
             System.exit(1);
         }
 
         UDPEchoReader reader = new UDPEchoReader(socket);
-        reader.setDaemon(true);
-        reader.start();
+        reader.setDaemon(true); // sets thread to be a daemon thread
+        reader.start(); // starts execution of Thread
 
         System.out.println("Connected to " + address.toString() + " on port number " + PORT);
         System.out.println("Ready to send messages...");
@@ -85,6 +91,8 @@ public class EchoClient {
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
+            System.out.println("Exiting program..");
+            System.exit(1);
         }
     }
 }
